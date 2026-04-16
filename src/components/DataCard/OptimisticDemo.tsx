@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import type { MockPost } from '../../types'
 import { usePlayground } from '../../context/PlaygroundContext'
 import { mockLikePost } from '../../api/mockApi'
@@ -13,9 +13,18 @@ interface LikeState {
 
 export default function OptimisticDemo({ posts }: { posts: MockPost[] }) {
   const { addEvent, state } = usePlayground()
-  const [likeState, setLikeState] = useState<LikeState>(() =>
-    Object.fromEntries(posts.map(p => [p.id, { count: p.likes, status: 'idle', rollback: false }])),
-  )
+  const [likeState, setLikeState] = useState<LikeState>({})
+
+  // Sync new/changed posts into likeState; preserve entries already being interacted with
+  useEffect(() => {
+    setLikeState(prev => {
+      const next: LikeState = {}
+      for (const p of posts) {
+        next[p.id] = prev[p.id] ?? { count: p.likes, status: 'idle', rollback: false }
+      }
+      return next
+    })
+  }, [posts])
 
   const handleLike = useCallback(async (post: MockPost) => {
     const prevCount = likeState[post.id]?.count ?? post.likes
