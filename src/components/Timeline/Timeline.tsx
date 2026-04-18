@@ -53,12 +53,14 @@ export default function Timeline() {
           </div>
         ) : (
           events.map(evt => (
-            <div key={evt.id} className="timeline-event">
+            <div key={evt.id}>
+              <div  className="timeline-event">
               <span className="event-time">{formatTime(evt.timestamp)}</span>
               <span className={`event-badge ${evt.type}`}>
                 {EVENT_ICONS[evt.type]} {evt.type}
               </span>
-              <span className="event-message">{evt.message}</span>
+            </div>
+            <div className='tml-msg'> <span className="event-message">{evt.message}</span></div>
             </div>
           ))
         )}
